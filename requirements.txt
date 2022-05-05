@@ -1,0 +1,8 @@
+requests>=2.27.1
+beautifulsoup4>=4.11.1
+cchardet>=2.1.7
+lxml>=4.8.0
+
+numpy>=1.22.3
+pandas>=1.4.2
+jupyter>=1.0.0

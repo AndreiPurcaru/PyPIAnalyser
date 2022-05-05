@@ -1,0 +1,3 @@
+# Ignore data folder since it contains large files that should not be versioned
+data
+__pycache__
