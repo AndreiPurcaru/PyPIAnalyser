@@ -1,6 +1,8 @@
 import json
 import re
 from pathlib import Path
+
+import pandas as pd
 import requests
 import csv
 from bs4 import BeautifulSoup
@@ -57,13 +59,19 @@ def read_all_packages_metadata_from_file():
     print(json.dumps(json_data, indent=4))
 
 
-compiled_rx = re.compile(r'\((?P<version>(\w+|\.|=|!|>|<)*)\)')
+compiled_rx = re.compile(r'\((?P<version>(?:\w+|\.|=|!|>|<|,|\s)*)\)')
 
 
-def extract_semantic_version(df):
+def deprecated_regex_extractor(s: str) -> str:
+
+    found = compiled_rx.findall(s)
+    return found[0] if found else "*"
+
+
+def deprecated_extract_semantic_version(df: pd.DataFrame):
     output_df = df.copy()
     # print(output_df)
-    return output_df.str.extract(compiled_rx)
+    return output_df.astype(str).apply(deprecated_regex_extractor)
 
 
 # Press the green button in the gutter to run the script.
