@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 import requests
@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 
 # Saving the absolute path of the current script file to be able to use relative file paths.
 # This is necessary because the scripts in this file will be executed from different directories.
+from pandas.core.groupby import DataFrameGroupBy
+
 path = Path(__file__).parent
 
 
@@ -77,14 +79,14 @@ def deprecated_extract_semantic_version(df: pd.DataFrame):
 
 def version_extractor(string: str) -> str:
     if not string:
-        return '*'
+        return '>=0.0.0'
     # Replace ) with ( to make splitting easier and more precise
     split = string.replace(')', '(').split('(')
     # Remove the trailing parenthesis
-    return split[1] if len(split) > 1 else '*'
+    return split[1] if len(split) > 1 else '>=0.0.0'
 
 
-def name_extractor(string: str) -> str | None:
+def name_extractor(string: str) -> Optional[str]:
     # If we can't find either symbol, then we assume that's the dependency name
     if not string:
         return None
@@ -110,7 +112,25 @@ def extract_name_and_version_from_list(dependencies: List[str]) -> [(str, str)]:
     return results
 
 
+def deprecated_convert_to_normalized_format(grouped_df: DataFrameGroupBy):
+    return_list = []
+    for _, rows in grouped_df:
+        inner_dict = {
+            'name': rows['name'].values[0],
+            'versions': {
+                rows['version'].values[0]: {
+                    'timestamp': rows['upload_time'].values[0],
+                    'dependencies': {}
+                }
+            }
+        }
+        for dep, v in zip(rows['dependency_name'].values, rows['dependency_version'].values):
+            inner_dict['versions'][rows['version'].values[0]]['dependencies'] |= {dep: v}
+        return_list.append(inner_dict)
+    return pd.DataFrame(return_list)
+
+
 if __name__ == '__main__':
     # print(json.dumps(get_json_for_package('requests'), indent=4))
     read_all_packages_metadata_from_file()
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
