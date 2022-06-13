@@ -8,3 +8,6 @@ pandas>=1.4.2
 jupyter>=1.0.0
 
 polars>=0.13.36
+
+py2neo >=2021.2.3
+semantic-version >= 2.10.0
