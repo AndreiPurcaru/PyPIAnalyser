@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 # coding: utf-8
 import json
-import multiprocessing
-from functools import partial
-from multiprocessing import Pool
 
 from py2neo import Graph
 from py2neo.bulk import create_relationships
 from semantic_version import SimpleSpec, Version
+
 
 # graph = Graph('bolt://localhost:7687', auth=('neo4j', 'softwareThatMatters'))
 #
@@ -48,7 +46,7 @@ def create_relationship_data(inp: dict[str, dict[str, dict]]):
     keys = set(inp.keys())
     relationship_data = []
     for index, (pack_name, pack) in enumerate(inp.items()):
-        
+
         for version_name, version_data in pack['versions'].items():
             dependent_info = (pack_name, version_name, version_data['timestamp'])
             for dependency_name, dependency_version_constraint in version_data['dependencies'].items():
@@ -71,7 +69,7 @@ def create_relationship_data(inp: dict[str, dict[str, dict]]):
                                                inp[dependency_name]['versions'][dependency_version]['timestamp'])
                             relationship_data.append((dependent_info, {}, dependency_info))
 
-        if index % 10_000:
+        if index % 10_000 == 0:
             print((index / len(inp)) * 100, "% done!")
             create_relationships(graph.auto(), relationship_data, "DEPENDS_ON",
                                  start_node_key=('NameVersion', 'name', 'version', 'timestamp'),
@@ -100,7 +98,6 @@ if __name__ == "__main__":
     #     pool.map(partial_function, input_data.values())
 
     create_relationship_data(input_data)
-
 
 # flat_results = sum(results, [])
 # compatible_dependency_versions = spec.filter((Version.coerce(version) for version in input_data[dependency_name]['versions'].keys()))
