@@ -17,7 +17,7 @@ def convert_to_rfc3339(date: str):
     return str(parsed_date.isoformat())
 
 
-def extract_name_and_version(dependency_version_string: str, no_extra: bool = True) -> (str, str):
+def extract_name_and_version(dependency_version_string: str, no_extra: bool) -> (str, str):
     if no_extra and dependency_version_string.find("extra") != -1:
         return None, None
     dep_name = name_extractor(dependency_version_string)
@@ -26,7 +26,7 @@ def extract_name_and_version(dependency_version_string: str, no_extra: bool = Tr
         return dep_name, dep_version
 
 
-def process():
+def process(no_extra: bool = True):
     df = pl.read_json('../../data/big_query/bq_results.json', json_lines=True)
     df_sorted = df.sort(['name', 'version', 'upload_time'], reverse=[False, True, False])
 
@@ -64,7 +64,7 @@ def process():
 
         for dep in dictionary['requires_dist']:
 
-            dependency_name, dependency_version = extract_name_and_version(dep)
+            dependency_name, dependency_version = extract_name_and_version(dep, no_extra)
             # Only add dependency if we successfully extracted its name and version
             if dependency_name is not None and dependency_version is not None:
                 normalized_form['versions'][version]['dependencies'][dependency_name] = dependency_version
