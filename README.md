@@ -1,6 +1,6 @@
 # PyPI Analyser
 
-This repository contains a set of Python scripts and Jupyter Notebooks. Their purpose is to ~~gather~~(see [Difficulties Encountered](dif)) and process data into a normalized format. This data will be used in the creation of a [time dependent graph structure for dependencies](https://github.com/AJMBrands/SoftwareThatMatters).
+This repository contains a set of Python scripts and Jupyter Notebooks. Their purpose is to ~~gather~~(see [Difficulties Encountered](dif)) and process data into a normalized format. This data will be used in the creation of a [time dependent graph structure for dependencies](https://github.com/AndreiPurcaru/SoftwareThatMatters).
 
 ### Note
 The `analyser_big_query` and `analyser_big_query_pandas` files were used as a more of a playground for exploring data. 
